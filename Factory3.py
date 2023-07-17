@@ -655,6 +655,8 @@ if __name__ == '__main__':
     Spr.Cell(0,1).ExportVariable = TestUO.PressureIn
 
     Spr.Cell(0,1).ExportVariable.SetValue(300, 'MPa')
+
+
     '''
     #<---
 
@@ -665,6 +667,15 @@ if __name__ == '__main__':
     print(Spr.Table)
     TestUO.PressureIn.SetValue(500,"kPa")
     print(Spr.Table)
+
+    #--->
+    #пример как ссылаться на класс
+    '''
+    Massive =  np.empty(shape = (2,3), dtype= NumericalProperty)
+    Massive[0][0] = TestUO.PressureIn
+    print((Massive[0][0]).GetValue("kPa"))
+    '''
+    #<---
 
     #<<<
     #--->>
