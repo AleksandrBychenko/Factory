@@ -490,6 +490,14 @@ class BaseUnitOp:
     def VariableChanged(self, Variable : NumericalProperty):
         pass
 
+# My class 
+class Cell:
+
+    CalcOrder : int
+
+    def __init__(self, name, SimCase: Flowsheet, calcOrder = 500):
+        self.ImportedVeriable : NumericalProperty = None
+
 
 class DummyUnitOp(BaseUnitOp):
 
@@ -675,6 +683,12 @@ if __name__ == '__main__':
     Massive[0][0] = TestUO.PressureIn
     print((Massive[0][0]).GetValue("kPa"))
     '''
+    #<---
+
+    #--->
+    #Риализация Сell
+    cellTest = Cell("TestCell", Flwsht)
+    cellTest.ImportedVeriable = TestUO.PressureIn    
     #<---
 
     #<<<
