@@ -39,6 +39,7 @@ class UnitTypeEnum(Enum):
     TEMPERATURE = 17
     UNITLESS = 18
     NONE = 19
+    INDEX = 20
 class PropertyStateEnum(Enum):
     '''
     Enumeration class including states of properties
@@ -517,6 +518,9 @@ class DummyUnitOp(BaseUnitOp):
         self.TemperatureDrop = NumericalProperty("dT", UnitTypeEnum.DELTA_T, self, True, None)
         self.pressureFlag = False
         self.temperatureFlag = False
+        self.NumberOfRows = NumericalProperty("RowsNumber", UnitTypeEnum.INDEX, self, True, None, 5)
+        self.NumberOfColumns = NumericalProperty("ColumnsNumber", UnitTypeEnum.INDEX, self, True, None, 5)
+
 
     def __lt__(self, other):
         return self.CalcOrder < other.CalcOrder
@@ -542,6 +546,9 @@ class DummyUnitOp(BaseUnitOp):
 
 
     def VariableChanging(self, Variable : NumericalProperty):
+        if Variable.Tag == "RowsNumber":
+            #добавить проверку на дробное
+            if Variable.NewValue <= 0 : return False
         if Variable.NewValue < 0 : return False
         return True
 
@@ -607,6 +614,7 @@ class Cell:
     def __init__(self, name, SimCase: Flowsheet, calcOrder = 500):
         self.ImportedVariable : NumericalProperty = None
         self.ExportVariable : NumericalProperty = None
+        self.CalcOder = calcOrder
 
 
 if __name__ == '__main__':
@@ -667,6 +675,8 @@ if __name__ == '__main__':
     Spr.Table[0][0].ImportedVariable = TestUO.PressureIn  
     Spr.Table[0][0].ImportedVariable.SetValue(700,"kPa")  
     print(TestUO.PressureIn.GetValue("kPa"))
+
+    TestUO.NumberOfColumns.SetValue(10)
   
 
     #--->
