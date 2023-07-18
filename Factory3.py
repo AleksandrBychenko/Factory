@@ -496,6 +496,8 @@ class Cell:
     CalcOrder : int
 
     def __init__(self, name, SimCase: Flowsheet, calcOrder = 500):
+        self.NumberofColums = 5
+         
         self.ImportedVeriable : NumericalProperty = None
 
 
