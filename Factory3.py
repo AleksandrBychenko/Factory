@@ -548,12 +548,14 @@ class DummyUnitOp(BaseUnitOp):
         if Variable.Tag == "RowsNumber":
             #добавить проверку на дробное
             if Variable.NewValue <= 0 : return False
-            else : return round(Variable.NewValue)
+            else : 
+                Variable.NewValue = round(Variable.NewValue)
 
         if Variable.Tag == "ColumnsNumber":
             #добавить проверку на дробное
             if Variable.NewValue <= 0 : return False
-            else : return round(Variable.NewValue)
+            else : 
+                Variable.NewValue = round(Variable.NewValue)
         if Variable.NewValue < 0 : return False
         return True
 
@@ -658,10 +660,13 @@ if __name__ == '__main__':
     Spr.Table[9][9].ImportedVariable.SetValue(700,"kPa")  
     print(TestUO.PressureIn.GetValue("kPa"))
 
-    TestUO.NumberOfRows.SetValue(5)
+    TestUO.NumberOfRows.SetValue(5.6)
     TestUO.NumberOfColumns.SetValue(5)
     #Spr.Table.resize(2,4, refcheck= False)
     #Spr.Table.resize(10,10, refcheck = False)
+
+
+
     print(Spr.Table)
   
 
