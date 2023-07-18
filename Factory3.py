@@ -317,8 +317,7 @@ class NumericalProperty:
         self.Owner.VariableChanged(self)
         
         self.TryTriggerSolve()
-        # я добавляю
-        self.NewVal[0] = self.NewValue
+       
 
 
     def GetValue(self, units=""):
@@ -518,8 +517,8 @@ class DummyUnitOp(BaseUnitOp):
         self.TemperatureDrop = NumericalProperty("dT", UnitTypeEnum.DELTA_T, self, True, None)
         self.pressureFlag = False
         self.temperatureFlag = False
-        self.NumberOfRows = NumericalProperty("RowsNumber", UnitTypeEnum.INDEX, self, True, None, 5)
-        self.NumberOfColumns = NumericalProperty("ColumnsNumber", UnitTypeEnum.INDEX, self, True, None, 5)
+        self.NumberOfRows = NumericalProperty("RowsNumber", UnitTypeEnum.INDEX, self, True, None, 10)
+        self.NumberOfColumns = NumericalProperty("ColumnsNumber", UnitTypeEnum.INDEX, self, True, None,  10)
 
 
     def __lt__(self, other):
@@ -549,11 +548,22 @@ class DummyUnitOp(BaseUnitOp):
         if Variable.Tag == "RowsNumber":
             #добавить проверку на дробное
             if Variable.NewValue <= 0 : return False
+            else : return round(Variable.NewValue)
+
+        if Variable.Tag == "ColumnsNumber":
+            #добавить проверку на дробное
+            if Variable.NewValue <= 0 : return False
+            else : return round(Variable.NewValue)
         if Variable.NewValue < 0 : return False
         return True
 
     def VariableChanged(self, Variable : NumericalProperty):
-        pass
+        if Variable.Tag == "RowsNumber":
+            Spr.Table.resize(self.NumberOfColumns.GetValue(), Variable.NewValue, refcheck= False)
+        
+        if Variable.Tag == "ColumnsNumber":
+            Spr.Table.resize(Variable.NewValue, self.NumberOfRows.GetValue(), refcheck= False)
+        
 
     def Balance(self, larger_property : NumericalProperty, smaller_property : NumericalProperty, delta : NumericalProperty):
         if smaller_property.HasValue and larger_property.HasValue:
@@ -567,38 +577,6 @@ class DummyUnitOp(BaseUnitOp):
             return True
         return False
 
-#my new class installation
-class Unit(BaseUnitOp):
-    
-    
-
-    def VariableChanging(self, val):
-          if val < 0 : return False
-          return True
-    
-    def VariableChanged(self, x, y, val, Table):
-        Table[x,y] = val 
-        return Table
-    
-    #pass
-    def Calculate(self, IsForgetting: bool):
-        self.IsCalculated = False
-
-        if IsForgetting:
-            self.pressureFlag = False
-            self.temperatureFlag = False
-            return True
-
-        # Calculate UnitOp
-        if not self.pressureFlag:
-            self.pressureFlag = self.Balance(self.PressureIn, self.PressureOut, self.PressureDrop) 
-
-        if not self.temperatureFlag:
-            self.temperatureFlag = self.Balance(self.TemperatureIn, self.TemperatureOut, self.TemperatureDrop)
-
-        self.IsCalculated = self.pressureFlag and self.temperatureFlag
-        return self.IsCalculated
-
 
 # my Spreadsheet 
 class Spreadsheet(BaseUnitOp):
@@ -609,11 +587,7 @@ class Spreadsheet(BaseUnitOp):
         self.y = y
         self.Table = np.empty(shape=(self.y, self.x), dtype =  Cell )
     
-    def ChangSize(self):
-        self.x_new = 7
-        
-        
-    
+
 class Cell:
     def __init__(self, name, SimCase: Flowsheet, calcOrder = 500):
         self.ImportedVariable : NumericalProperty = None
@@ -684,9 +658,10 @@ if __name__ == '__main__':
     Spr.Table[9][9].ImportedVariable.SetValue(700,"kPa")  
     print(TestUO.PressureIn.GetValue("kPa"))
 
-    TestUO.NumberOfColumns.SetValue(10)
-    Spr.Table.resize(2,4, refcheck= False)
-    Spr.Table.resize(10,10, refcheck= False)
+    TestUO.NumberOfRows.SetValue(5)
+    TestUO.NumberOfColumns.SetValue(5)
+    #Spr.Table.resize(2,4, refcheck= False)
+    #Spr.Table.resize(10,10, refcheck = False)
     print(Spr.Table)
   
 
