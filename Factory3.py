@@ -604,10 +604,14 @@ class Unit(BaseUnitOp):
 class Spreadsheet(BaseUnitOp):
     
     def __init__(self, x, y):
+        #self.NumberOfRows : NumericalProperty = x
         self.x = x
         self.y = y
-        self.Table = np.empty(shape=(self.x, self.y), dtype =  Cell )
- 
+        self.Table = np.empty(shape=(self.y, self.x), dtype =  Cell )
+    
+    def ChangSize(self):
+        self.x_new = 7
+        
         
     
 class Cell:
@@ -673,10 +677,17 @@ if __name__ == '__main__':
     Spr = Spreadsheet(10,10)
     Spr.Table[0][0] = Cell("TestCell", Flwsht)
     Spr.Table[0][0].ImportedVariable = TestUO.PressureIn  
-    Spr.Table[0][0].ImportedVariable.SetValue(700,"kPa")  
+    Spr.Table[0][0].ImportedVariable.SetValue(700,"kPa")
+
+    Spr.Table[9][9] = Cell("TestCell", Flwsht)
+    Spr.Table[9][9].ImportedVariable = TestUO.PressureIn
+    Spr.Table[9][9].ImportedVariable.SetValue(700,"kPa")  
     print(TestUO.PressureIn.GetValue("kPa"))
 
     TestUO.NumberOfColumns.SetValue(10)
+    Spr.Table.resize(2,4, refcheck= False)
+    Spr.Table.resize(10,10, refcheck= False)
+    print(Spr.Table)
   
 
     #--->
