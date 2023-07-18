@@ -306,7 +306,7 @@ class NumericalProperty:
             raise Exception(f"NumericalProperty SetValue error! Property can't be modified: {self.Owner.Name}.{self.Tag}!")
 
         if units != "" and not units in Units.UnitsLibrary[self.UnitType].keys():
-            raise Exception(f"NumericalProperty SetValue error! Units with name {units} are unavailable for type {self.UnitType}")
+                raise Exception(f"NumericalProperty SetValue error! Units with name {units} are unavailable for type {self.UnitType}")
         
         self.NewValue = val if (val is None or units == "") else Units.UnitsLibrary[self.UnitType][units].convert_to_si(val)
         if not self.Owner.VariableChanging(self):
@@ -491,6 +491,7 @@ class BaseUnitOp:
         pass
 
 # My class 
+'''
 class Cell:
 
     CalcOrder : int
@@ -499,6 +500,7 @@ class Cell:
         self.NumberofColums = 5
          
         self.ImportedVeriable : NumericalProperty = None
+'''
 
 
 class DummyUnitOp(BaseUnitOp):
@@ -597,27 +599,15 @@ class Spreadsheet(BaseUnitOp):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.Table = np.empty(shape=(self.x, self.y), dtype = object )
-        #self.Cell =  Cell(x = self.x, y = self.y, Table = self.Table ) 
-    
-    
-    def Cell(self, x, y, value):
-        self.Table[x][y] = value 
-        #print(self.Table[x][y])
+        self.Table = np.empty(shape=(self.x, self.y), dtype =  Cell )
+ 
         
-'''    
+    
 class Cell:
-    def __init__(self, x, y, Table):
-         
-        self.x = x
-        self.y = y  
-        self.Table= Table
-        #self.prIn =  NumericalProperty.NewVal
-    def ImportVariable(self, value):
-        self.Table[0][0]= value
-        
-        print(self.Table)
-'''
+    def __init__(self, name, SimCase: Flowsheet, calcOrder = 500):
+        self.ImportedVariable : NumericalProperty = None
+        self.ExportVariable : NumericalProperty = None
+
 
 if __name__ == '__main__':
     
@@ -672,11 +662,12 @@ if __name__ == '__main__':
 
     #>>>
     #моя реализация
-    Spr = Spreadsheet(2,2)
-    Spr.Cell(0,0,TestUO.PressureIn.NewVal)
-    print(Spr.Table)
-    TestUO.PressureIn.SetValue(500,"kPa")
-    print(Spr.Table)
+    Spr = Spreadsheet(10,10)
+    Spr.Table[0][0] = Cell("TestCell", Flwsht)
+    Spr.Table[0][0].ImportedVariable = TestUO.PressureIn  
+    Spr.Table[0][0].ImportedVariable.SetValue(700,"kPa")  
+    print(TestUO.PressureIn.GetValue("kPa"))
+  
 
     #--->
     #пример как ссылаться на класс
@@ -688,9 +679,11 @@ if __name__ == '__main__':
     #<---
 
     #--->
+    '''
     #Риализация Сell
     cellTest = Cell("TestCell", Flwsht)
-    cellTest.ImportedVeriable = TestUO.PressureIn    
+    cellTest.ImportedVeriable = TestUO.PressureIn  
+    '''  
     #<---
 
     #<<<
