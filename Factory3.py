@@ -583,15 +583,18 @@ class DummyUnitOp(BaseUnitOp):
 # my Spreadsheet 
 class Spreadsheet(BaseUnitOp):
     
-    def __init__(self, x, y):
+    def __init__(self, x, y, SimCase: Flowsheet):
         #self.NumberOfRows : NumericalProperty = x
         self.x = x
         self.y = y
         self.Table = np.empty(shape=(self.y, self.x), dtype =  Cell )
-    
+        for i in range(y):
+            for j in range (x):
+                self.Table[i][j] = Cell("TestCell")
+
 
 class Cell:
-    def __init__(self, name, SimCase: Flowsheet, calcOrder = 500):
+    def __init__(self, name, calcOrder = 500):
         self.ImportedVariable : NumericalProperty = None
         self.ExportVariable : NumericalProperty = None
         self.CalcOder = calcOrder
@@ -650,8 +653,8 @@ if __name__ == '__main__':
 
     #>>>
     #моя реализация
-    Spr = Spreadsheet(10,10)
-    Spr.Table[0][0] = Cell("TestCell", Flwsht)
+    Spr = Spreadsheet(10, 10, Flwsht)
+    #Spr.Table[0][0] = Cell("TestCell", Flwsht)
     Spr.Table[0][0].ImportedVariable = TestUO.PressureIn  
     Spr.Table[0][0].ImportedVariable.SetValue(700,"kPa")
 
