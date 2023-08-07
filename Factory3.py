@@ -267,8 +267,7 @@ class NumericalProperty:
         self.CalcBy = calcByObject
         self.Value = defaultValue
         self.NewValue = None
-        # я добавляю
-        self.NewVal = [None]
+
 
     def TryTriggerSolve(self):
         if self.TriggerSolve:
@@ -517,8 +516,8 @@ class DummyUnitOp(BaseUnitOp):
         self.TemperatureDrop = NumericalProperty("dT", UnitTypeEnum.DELTA_T, self, True, None)
         self.pressureFlag = False
         self.temperatureFlag = False
-        self.NumberOfRows = NumericalProperty("RowsNumber", UnitTypeEnum.INDEX, self, True, None, 10)
-        self.NumberOfColumns = NumericalProperty("ColumnsNumber", UnitTypeEnum.INDEX, self, True, None,  10)
+        #self.NumberOfRows = NumericalProperty("RowsNumber", UnitTypeEnum.INDEX, self, True, None, 10)
+        #self.NumberOfColumns = NumericalProperty("ColumnsNumber", UnitTypeEnum.INDEX, self, True, None,  10)
 
 
     def __lt__(self, other):
@@ -545,27 +544,12 @@ class DummyUnitOp(BaseUnitOp):
 
 
     def VariableChanging(self, Variable : NumericalProperty):
-        if Variable.Tag == "RowsNumber":
-            #добавить проверку на дробное
-            if Variable.NewValue <= 0 : return False
-            else : 
-                Variable.NewValue = round(Variable.NewValue)
 
-        if Variable.Tag == "ColumnsNumber":
-            #добавить проверку на дробное
-            if Variable.NewValue <= 0 : return False
-            else : 
-                Variable.NewValue = round(Variable.NewValue)
         if Variable.NewValue < 0 : return False
         return True
 
     def VariableChanged(self, Variable : NumericalProperty):
-        if Variable.Tag == "RowsNumber":
-            Spr.Table.resize(self.NumberOfColumns.GetValue(), Variable.NewValue, refcheck= False)
-        
-        if Variable.Tag == "ColumnsNumber":
-            Spr.Table.resize(Variable.NewValue, self.NumberOfRows.GetValue(), refcheck= False)
-        
+        pass
 
     def Balance(self, larger_property : NumericalProperty, smaller_property : NumericalProperty, delta : NumericalProperty):
         if smaller_property.HasValue and larger_property.HasValue:
@@ -583,7 +567,8 @@ class DummyUnitOp(BaseUnitOp):
 # my Spreadsheet 
 class Spreadsheet(BaseUnitOp):
     
-    def __init__(self, x, y, SimCase: Flowsheet):
+    def __init__(self, x, y, name, SimCase: Flowsheet):
+        super().__init__(name, SimCase, calcOrder = 500)
         #self.NumberOfRows : NumericalProperty = x
         self.x = x
         self.y = y
@@ -591,7 +576,51 @@ class Spreadsheet(BaseUnitOp):
         for i in range(y):
             for j in range (x):
                 self.Table[i][j] = Cell("TestCell")
+        
+        # для ф измен. разм.
+        self.NumberOfRows_y = y
+        self.NumberOfColumns_x = x
 
+        self.NumberOfRows = NumericalProperty("RowsNumber", UnitTypeEnum.INDEX, self, True, None, self.y)
+        self.NumberOfColumns = NumericalProperty("ColumnsNumber", UnitTypeEnum.INDEX, self, True, None,  self.x)
+
+    def NumberOfRows2 (self, send):
+        if type(send) == int:
+            new  =  int(send)
+            self.Table.resize((self.NumberOfColumns_x, new),  refcheck= False)
+            self.NumberOfRows_y = new
+            return True
+        else:
+            print("wrong tipe")
+            return False
+        
+    def PrintTable(self):
+        for i in range(0, len(self.Table)):
+            for i2 in range(0, len(self.Table[i])):
+                print(self.Table[i][i2], end=' ')
+       
+
+    def VariableChanging(self, Variable : NumericalProperty):
+        if Variable.Tag == "RowsNumber":
+            #добавить проверку на дробное
+            if Variable.NewValue <= 0 : return False
+            else : 
+                Variable.NewValue = round(Variable.NewValue)
+        
+        if Variable.Tag == "ColumnsNumber":
+            #добавить проверку на дробное
+            if Variable.NewValue <= 0 : return False
+            else : 
+                Variable.NewValue = round(Variable.NewValue)
+    
+    def VariableChanged(self, Variable : NumericalProperty):
+          
+        if Variable.Tag == "ColumnsNumber":
+            self.Table = self.Table.resize((self.NumberOfRows.GetValue(), Variable.NewValue), refcheck= False)
+        
+        if Variable.Tag == "RowsNumber":
+            self.Table = self.Table.resize((Variable.NewValue, self.NumberOfColumns.GetValue()),  refcheck= False)
+        
 
 class Cell:
     def __init__(self, name, calcOrder = 500):
@@ -653,24 +682,31 @@ if __name__ == '__main__':
 
     #>>>
     #моя реализация
-    Spr = Spreadsheet(10, 10, Flwsht)
+    Spr = Spreadsheet(10, 10, "Spreadsheet1", Flwsht)
     #Spr.Table[0][0] = Cell("TestCell", Flwsht)
     Spr.Table[0][0].ImportedVariable = TestUO.PressureIn  
     Spr.Table[0][0].ImportedVariable.SetValue(700,"kPa")
 
     Spr.Table[9][9] = Cell("TestCell", Flwsht)
     Spr.Table[9][9].ImportedVariable = TestUO.PressureIn
-    Spr.Table[9][9].ImportedVariable.SetValue(700,"kPa")  
-    print(TestUO.PressureIn.GetValue("kPa"))
+    Spr.Table[9][9].ImportedVariable.SetValue(500,"kPa")  
+    print(Spr.Table[0][0].ImportedVariable.GetValue("kPa"))
 
-    TestUO.NumberOfRows.SetValue(5.6)
-    TestUO.NumberOfColumns.SetValue(5)
+    #Spr.PrintTable()
+    #NumberOfRows(-1)
+
+    #Spr.NumberOfRows2(15)
+
+    #print(Spr.Table)
+
+    Spr.NumberOfRows2(3)
+    #Spr.NumberOfRow.Setvalue(12SS)
     #Spr.Table.resize(2,4, refcheck= False)
     #Spr.Table.resize(10,10, refcheck = False)
-
-
-
     print(Spr.Table)
+
+
+    #print(Spr.NumberOfColumns.GetValue())
   
 
     #--->
