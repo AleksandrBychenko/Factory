@@ -567,7 +567,7 @@ class DummyUnitOp(BaseUnitOp):
 # my Spreadsheet 
 class Spreadsheet(BaseUnitOp):
     
-    def __init__(self, x, y, name, SimCase: Flowsheet):
+    def __init__(self, y, x, name, SimCase: Flowsheet):
         super().__init__(name, SimCase, calcOrder = 500)
         #self.NumberOfRows : NumericalProperty = x
         self.x = x
@@ -579,49 +579,53 @@ class Spreadsheet(BaseUnitOp):
         
         # для ф измен. разм.
         self.NumberOfRows_y = y
-        self.NumberOfColumns_x = x
+        self.NumberOfColums_x = x
 
-        self.NumberOfRows = NumericalProperty("RowsNumber", UnitTypeEnum.INDEX, self, True, None, self.y)
-        self.NumberOfColumns = NumericalProperty("ColumnsNumber", UnitTypeEnum.INDEX, self, True, None,  self.x)
 
-    def NumberOfRows2 (self, send):
-        if type(send) == int:
+        #  !!! [y][x] = [rows][colums]
+
+    def NumberOfRows (self, send):
+        if type(round(send)) == int:
             new  =  int(send)
-            self.Table.resize((self.NumberOfColumns_x, new),  refcheck= False)
+            self.Table.resize((new, self.NumberOfColums_x),  refcheck= False)
+            
+            # filling in new cells
+            if new > self.NumberOfRows_y:
+                for i in range(self.NumberOfRows_y - 1, new):
+                    for j in range (self.NumberOfColums_x):
+                        self.Table[i][j] =  Cell("TestCell")
+            
             self.NumberOfRows_y = new
             return True
         else:
             print("wrong tipe")
             return False
-        
+       
+    def NumberOfColums (self, send):
+
+        if type(round(send)) == int:
+            new  =  int(send)
+            #self.Table.resize((self.NumberOfRows_y, new),  refcheck= False)
+            #self.Table.append(self.Table, np.zeros([len(b), new]),1)
+            '''
+            # filling in new cells
+            if new > self.NumberOfColums_x:
+                for i in range(self.NumberOfRows_y):
+                    for j in range(self.NumberOfColums_x - 1, new):
+                        self.Table[i][j] =  Cell("TestCell")
+            '''
+                        
+            self.NumberOfColums_x = new
+            return True
+        else:
+            print("wrong tipe")
+            return False
+    
     def PrintTable(self):
         for i in range(0, len(self.Table)):
             for i2 in range(0, len(self.Table[i])):
                 print(self.Table[i][i2], end=' ')
        
-
-    def VariableChanging(self, Variable : NumericalProperty):
-        if Variable.Tag == "RowsNumber":
-            #добавить проверку на дробное
-            if Variable.NewValue <= 0 : return False
-            else : 
-                Variable.NewValue = round(Variable.NewValue)
-        
-        if Variable.Tag == "ColumnsNumber":
-            #добавить проверку на дробное
-            if Variable.NewValue <= 0 : return False
-            else : 
-                Variable.NewValue = round(Variable.NewValue)
-    
-    def VariableChanged(self, Variable : NumericalProperty):
-          
-        if Variable.Tag == "ColumnsNumber":
-            self.Table = self.Table.resize((self.NumberOfRows.GetValue(), Variable.NewValue), refcheck= False)
-        
-        if Variable.Tag == "RowsNumber":
-            self.Table = self.Table.resize((Variable.NewValue, self.NumberOfColumns.GetValue()),  refcheck= False)
-        
-
 class Cell:
     def __init__(self, name, calcOrder = 500):
         self.ImportedVariable : NumericalProperty = None
@@ -682,16 +686,18 @@ if __name__ == '__main__':
 
     #>>>
     #моя реализация
-    Spr = Spreadsheet(10, 10, "Spreadsheet1", Flwsht)
+    Spr = Spreadsheet(3, 3, "Spreadsheet1", Flwsht)
     #Spr.Table[0][0] = Cell("TestCell", Flwsht)
     Spr.Table[0][0].ImportedVariable = TestUO.PressureIn  
     Spr.Table[0][0].ImportedVariable.SetValue(700,"kPa")
 
+    '''
     Spr.Table[9][9] = Cell("TestCell", Flwsht)
     Spr.Table[9][9].ImportedVariable = TestUO.PressureIn
     Spr.Table[9][9].ImportedVariable.SetValue(500,"kPa")  
     print(Spr.Table[0][0].ImportedVariable.GetValue("kPa"))
-
+    '''
+    
     #Spr.PrintTable()
     #NumberOfRows(-1)
 
@@ -699,7 +705,9 @@ if __name__ == '__main__':
 
     #print(Spr.Table)
 
-    Spr.NumberOfRows2(15)
+    #Spr.NumberOfRows(8)
+    #Spr.NumberOfColums(7)
+
     #Spr.NumberOfRow.Setvalue(12SS)
     #Spr.Table.resize(2,4, refcheck= False)
     #Spr.Table.resize(10,10, refcheck = False)
@@ -707,7 +715,16 @@ if __name__ == '__main__':
     
     print(Spr.Table)
 
-    print(Spr.Table[0][0])
+    b = np.array([[1.5, 2, 3], [4, 5, 6],[4, 5, 6]])
+    #b.resize((1, 3),  refcheck= False)
+    #b = np.append(b, np.zeros([len(b),2]),1)
+    #b.resize((1, 4),  refcheck= False)
+    #b = np.append(b, np.zeros([1,len(b)]),1)
+    b  = b[0:-1]
+    print(b)
+
+
+    #print(Spr.Table[9][0])
 
     #print(Spr.NumberOfColumns.GetValue())
   
