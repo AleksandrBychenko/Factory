@@ -699,7 +699,7 @@ if __name__ == '__main__':
 
     #print(Spr.Table)
 
-    Spr.NumberOfRows2(3)
+    Spr.NumberOfRows2(15)
     #Spr.NumberOfRow.Setvalue(12SS)
     #Spr.Table.resize(2,4, refcheck= False)
     #Spr.Table.resize(10,10, refcheck = False)
