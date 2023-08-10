@@ -703,8 +703,11 @@ if __name__ == '__main__':
     #Spr.NumberOfRow.Setvalue(12SS)
     #Spr.Table.resize(2,4, refcheck= False)
     #Spr.Table.resize(10,10, refcheck = False)
+
+    
     print(Spr.Table)
 
+    print(Spr.Table[0][0])
 
     #print(Spr.NumberOfColumns.GetValue())
   
