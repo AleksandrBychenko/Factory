@@ -585,7 +585,7 @@ class Spreadsheet(BaseUnitOp):
         #  !!! [y][x] = [rows][colums]
 
     def NumberOfRows (self, send):
-        if type(round(send)) == int:
+        if type(round(send)) == int and send > 0:
             new  =  int(send)
             self.Table.resize((new, self.NumberOfColums_x),  refcheck= False)
             
@@ -603,10 +603,18 @@ class Spreadsheet(BaseUnitOp):
        
     def NumberOfColums (self, send):
 
-        if type(round(send)) == int:
+        if type(round(send)) == int and send > 0:
             new  =  int(send)
+            if new < self.NumberOfRows_y:
+                self.Table  = self.Table[:, :-(self.NumberOfRows_y - new)]
+            else:
+                self.Table = np.append(self.Table, np.zeros([len(self.Table), (new - self.NumberOfRows_y)]),1)
+                for i in range(self.NumberOfRows_y):
+                    for j in range(self.NumberOfColums_x - 1, new):
+                        self.Table[i][j] =  Cell("TestCell")
             #self.Table.resize((self.NumberOfRows_y, new),  refcheck= False)
             #self.Table.append(self.Table, np.zeros([len(b), new]),1)
+
             '''
             # filling in new cells
             if new > self.NumberOfColums_x:
@@ -706,7 +714,7 @@ if __name__ == '__main__':
     #print(Spr.Table)
 
     #Spr.NumberOfRows(8)
-    #Spr.NumberOfColums(7)
+    Spr.NumberOfColums(8)
 
     #Spr.NumberOfRow.Setvalue(12SS)
     #Spr.Table.resize(2,4, refcheck= False)
@@ -720,7 +728,7 @@ if __name__ == '__main__':
     #b = np.append(b, np.zeros([len(b),2]),1)
     #b.resize((1, 4),  refcheck= False)
     #b = np.append(b, np.zeros([1,len(b)]),1)
-    b  = b[0:-1]
+    b  = b[:, :-1]
     print(b)
 
 
