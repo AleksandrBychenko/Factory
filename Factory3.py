@@ -610,8 +610,9 @@ class Spreadsheet(BaseUnitOp):
             new  =  int(send)
             if new < self.NumberOfRows_y:
 
-                #How do we reduce the size of the table
+                #How do we reduce the size of the table (axis = 0  -  строка  1  столбец )//np.delete(self.Table,1,axis = 1) -  УДОЛЯЕТ 1 СТОЛБЕЦ 
                 self.Table  = self.Table[:, :-(self.NumberOfRows_y - new)]
+                #self.Table = np.delete(self.Table, self.NumberOfRows_y - new ,axis = 1) 
             else:
 
                 #How do we increase the size of the table
@@ -674,7 +675,7 @@ if __name__ == '__main__':
 
     #>>>
     #моя реализация
-    Spr = Spreadsheet(3, 3, "Spreadsheet1", Flwsht)
+    Spr = Spreadsheet(5, 5, "Spreadsheet1", Flwsht)
     #Spr.Table[0][0] = Cell("TestCell", Flwsht)
     Spr.Table[0][0].ImportedVariable = TestUO.PressureIn  
     Spr.Table[0][0].ImportedVariable.SetValue(700,"kPa")
@@ -697,7 +698,7 @@ if __name__ == '__main__':
     #print(Spr.Table)
 
     #Spr.NumberOfRows(8)
-    Spr.NumberOfColums(8)
+    Spr.NumberOfColums(3)
 
     #Spr.NumberOfRow.Setvalue(12SS)
     #Spr.Table.resize(2,4, refcheck= False)
