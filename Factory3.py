@@ -581,15 +581,17 @@ class Spreadsheet(BaseUnitOp):
         self.NumberOfRows_y = y
         self.NumberOfColums_x = x
 
-
         #  !!! [y][x] = [rows][colums]
 
+    # def for change size of rows
     def NumberOfRows (self, send):
         if type(round(send)) == int and send > 0:
             new  =  int(send)
+
+            #how we change size
             self.Table.resize((new, self.NumberOfColums_x),  refcheck= False)
             
-            # filling in new cells
+            # filling in new part class Cells
             if new > self.NumberOfRows_y:
                 for i in range(self.NumberOfRows_y - 1, new):
                     for j in range (self.NumberOfColums_x):
@@ -598,41 +600,33 @@ class Spreadsheet(BaseUnitOp):
             self.NumberOfRows_y = new
             return True
         else:
-            print("wrong tipe")
+            print("Wrong tipe!")
             return False
        
+    # def for change size of colums
     def NumberOfColums (self, send):
 
         if type(round(send)) == int and send > 0:
             new  =  int(send)
             if new < self.NumberOfRows_y:
+
+                #How do we reduce the size of the table
                 self.Table  = self.Table[:, :-(self.NumberOfRows_y - new)]
             else:
-                self.Table = np.append(self.Table, np.zeros([len(self.Table), (new - self.NumberOfRows_y)]),1)
-                for i in range(self.NumberOfRows_y):
-                    for j in range(self.NumberOfColums_x - 1, new):
-                        self.Table[i][j] =  Cell("TestCell")
-            #self.Table.resize((self.NumberOfRows_y, new),  refcheck= False)
-            #self.Table.append(self.Table, np.zeros([len(b), new]),1)
 
-            '''
-            # filling in new cells
-            if new > self.NumberOfColums_x:
+                #How do we increase the size of the table
+                self.Table = np.append(self.Table, np.zeros([len(self.Table), (new - self.NumberOfRows_y)]),1)
+                
+                # filling in new part class Cells
                 for i in range(self.NumberOfRows_y):
                     for j in range(self.NumberOfColums_x - 1, new):
-                        self.Table[i][j] =  Cell("TestCell")
-            '''
-                        
+                        self.Table[i][j] =  Cell("TestCell")  
+
             self.NumberOfColums_x = new
             return True
         else:
-            print("wrong tipe")
+            print("Wrong tipe!")
             return False
-    
-    def PrintTable(self):
-        for i in range(0, len(self.Table)):
-            for i2 in range(0, len(self.Table[i])):
-                print(self.Table[i][i2], end=' ')
        
 class Cell:
     def __init__(self, name, calcOrder = 500):
@@ -676,21 +670,7 @@ if __name__ == '__main__':
     }
 
  
-    # Start Solver
-    Flwsht.ActivateSolver()
 
-    #--->
-    '''
-    #что я должен реализовать
-    Spr = Spreadsheet(x,y)
-    Spr.Cell(0,0).ImportVariable = TestUO.TemperatureIn
-    Spr.Cell(0,1).ExportVariable = TestUO.PressureIn
-
-    Spr.Cell(0,1).ExportVariable.SetValue(300, 'MPa')
-
-
-    '''
-    #<---
 
     #>>>
     #моя реализация
@@ -705,7 +685,10 @@ if __name__ == '__main__':
     Spr.Table[9][9].ImportedVariable.SetValue(500,"kPa")  
     print(Spr.Table[0][0].ImportedVariable.GetValue("kPa"))
     '''
-    
+
+    #!!!!!!!!!!
+    #проверка на измение размера
+
     #Spr.PrintTable()
     #NumberOfRows(-1)
 
@@ -723,72 +706,9 @@ if __name__ == '__main__':
     
     print(Spr.Table)
 
-    b = np.array([[1.5, 2, 3], [4, 5, 6],[4, 5, 6]])
-    #b.resize((1, 3),  refcheck= False)
-    #b = np.append(b, np.zeros([len(b),2]),1)
-    #b.resize((1, 4),  refcheck= False)
-    #b = np.append(b, np.zeros([1,len(b)]),1)
-    b  = b[:, :-1]
-    print(b)
 
-
-    #print(Spr.Table[9][0])
-
-    #print(Spr.NumberOfColumns.GetValue())
-  
-
-    #--->
-    #пример как ссылаться на класс
-    '''
-    Massive =  np.empty(shape = (2,3), dtype= NumericalProperty)
-    Massive[0][0] = TestUO.PressureIn
-    print((Massive[0][0]).GetValue("kPa"))
-    '''
-    #<---
-
-    #--->
-    '''
-    #Риализация Сell
-    cellTest = Cell("TestCell", Flwsht)
-    cellTest.ImportedVeriable = TestUO.PressureIn  
-    '''  
-    #<---
-
-    #<<<
-    #--->>
-    '''
-    # попытка реализации    
-    import numpy as np
-
-    #temp = pressureIn 
-    #создание матрицы 
-    m = np.empty(shape=(2, 2), dtype = object )
-    #np.resize(a,(2,3))
-    #prIn =  [pressureIn]
-
-    #перессылка 
-    prIn =  TestUO.PressureIn.NewVal
-    m[0][0]= prIn
-    
-    # внешнее изменение 
-    TestUO.PressureIn.SetValue(500,"kPa")
-
-    #проверка
-    print(m[0][0])
-    print(prIn)
-    '''
-
-
-    #<<---
-
-    '''
-    TestUO.PressureOut.SetValue(m[0][0],"kPa")
-    #m[0][0] = 400
-    pressureOut = TestUO.PressureOut.GetValue("kPa")
-    print(pressureOut)
-    '''
-
-    #<<---
+    # Start Solver
+    Flwsht.ActivateSolver()
 
 
 
