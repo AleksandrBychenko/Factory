@@ -3,15 +3,28 @@ import numpy as np
 #from formulas import Parser, Array
 
 a = np.array([[1,2,'= IF(A1>A2,"GREATER","LOWER")']])
-#func = formulas.Parser().ast('= IF(A1 > A2,"GREATER","LOWER")')[1].compile()
-#b = (1,2)
-func = formulas.Parser().ast('= IF(A1 > A2,"GREATER","LOWER")')[1].compile()
-#print(func)
+
+#компилация формулы
+func = formulas.Parser().ast(a[0][2])[1].compile()
+
+#какик клетки использовали
+use_cell = list(func.inputs)
+
 print(list(func.inputs))
-b = [1,2]
-#test = func(b)
-#print(test)
-test = func(*b)
+
+#из  клетки получаем номер строки и столбца и создаем масиив нужных данных
+from openpyxl.utils import column_index_from_string
+for i in range(len(use_cell)):
+    cell_name =use_cell[i]
+    column_name = cell_name[0] # Получаем букву столбца из имени ячейки
+    row_number = int(cell_name[1:]) - 1  # Получаем номер строки из имени ячейки
+    column_number = column_index_from_string(column_name) - 1  # Получаем номер столбца из буквы
+    #data = data.append(a[column_number][row_number])
+    use_cell[i] = a[column_number][row_number]
+    print(use_cell[i])
+
+# передаем массив нужных данных в функцию 
+test = func(*use_cell)
 print(test)
 
 
