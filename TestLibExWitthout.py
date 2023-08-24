@@ -2,8 +2,38 @@ import formulas
 import numpy as np
 #from formulas import Parser, Array
 
-a = np.array([[1,2,'= IF(A1>A2,"GREATER","LOWER")']])
+#a = np.array([[1,2,'= IF(A1>A2,"GREATER","LOWER")']])
+#a = np.array([[1,2,3]])
+#a = np.array([[1,2,'gfgbb']])
 
+
+#Проверка является ли формуа 
+parser = formulas.Parser()
+
+'''
+if formulas.errors.FormulaError(a[0][2]):
+    print ("Formula")
+else: 
+    print (" NO")
+'''
+
+'''
+try:
+    parsed_expression = formulas.Parser().ast(a[0][2])
+    print("Выражение является формулой Excel.")
+except formulas.errors.FormulaError:
+    print("Выражение не является формулой Excel.")
+'''
+    
+'''
+try:
+    # инструкции, которые могут вызвать ошибку
+    func = formulas.Parser().ast(a[0][2])[1].compile()
+except NotFormula:
+    # инструкции, которые выполняются при возникновении ошибки
+    print("Деление на ноль!")
+'''
+    
 #компилация формулы
 func = formulas.Parser().ast(a[0][2])[1].compile()
 
